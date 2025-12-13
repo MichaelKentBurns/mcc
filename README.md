@@ -15,6 +15,8 @@ So, we signed up for a new project to do the same thing for a new RISC architect
 The year was early 1986, a full 40 years ago.    
 It wasn't a full compiler yet (and never will), but it is a very powerful preprocessor.   
 
+Our development environment at the time was on Apollo Computer workstations, based on the Motorola 68000 processor.  It ran the Domain/OS which was a proprietary UNIX like system. Apollo was in business from 1980-1989 until it was purchased by Hewlett Packard.   That model eventually gave way to the HP workstations.  
+
 ### Precompilation. 
 
 The reason for that power was that I had implemented "pre-compiled header files".  
