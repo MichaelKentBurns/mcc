@@ -15,7 +15,9 @@
 /*                                                                   */
 /*  Internal functions in this module                                */
 /* INCLUDE .h                                                        */
+#include "mcccfg.h"                                                  
 #include <stdio.h>
+#include <string.h>
 #include <signal.h>
 #ifdef unix
 #include <sys/types.h>
@@ -35,6 +37,8 @@
 static jmp_buf crokbuf;
 static int crokbufSet = FALSE;
 void mcccroak();
+void mccclosesrc(sourcep src);
+void mccterm(char* pgmname);
 /********************************************************** mccmain  */
 /*-------------------------------------------------------------------*/
 /* NAME: mccmain                                                     */
@@ -47,10 +51,7 @@ void mcccroak();
 /* BRIDGED:  none                                                    */
 /* PURPOSE:                                                          */
 /* USAGE:                                                            */
- int main (argc,argv)                 
-/* PARAMETERS:                                                       */
-   int argc;
-   char *argv[];
+ int main (int argc, char** argv)                 
 {
 /* RETURNS:                                                          */
 /*   0 if all ran ok, else errors occured                            */
@@ -85,7 +86,6 @@ long start;
 float cpuseconds;
 long wallseconds;
 #define TMSUNITSPERSECOND 60
-long time();
 #ifndef DOS
 struct tms timesbuf;
 #endif
@@ -138,8 +138,9 @@ if (strcmp(argv[0]+strlen(argv[0])-8,"mccdebug") != 0)
 #endif
   }
 
-if (!mccinit(argc,argv))
+if (!mccinit(argc,argv)) {
    MCCRETURN(MCCINITERRS,1);
+}
 
 if (mccoption[MCCOPTVERBOSE]) 
  {
@@ -239,7 +240,7 @@ for (argno = 1,nfiles = 0;
           fil = arg;
        len = fil - arg;
        memcpy(mcchomedir,arg,len);
-       mcchomedir[len] = NULL;
+       mcchomedir[len] = (char) NULL;
        
        /* ext probably points to last seperator character, else begining of arg */
        if (ext < arg && strcmp(arg,"-") != 0)
