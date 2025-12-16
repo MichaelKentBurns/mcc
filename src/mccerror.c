@@ -1,9 +1,7 @@
 
 #include "mcc.h"
 
-mccerr(code,tok)
-int code;
-tokenp tok;
+void mccerr(int code, tokenp tok)
 {
  char *text;
  static char *fmt = "ERROR: \"%s\" %d:%d : ";
@@ -23,9 +21,7 @@ tokenp tok;
  mccerrcount++;
 }
 
-mccwarning(code,tok)
-int code;
-tokenp tok;
+void mccwarning(int code, tokenp tok)
 {
  char *text;
  static char *fmt = "WARNING: \"%s\" %d:%d : ";
@@ -47,10 +43,7 @@ tokenp tok;
  mccwarningcount++;
 }
 
-mccwrite(fd,fmt,args)
- char *fd;
- char *fmt;
- struct { unsigned v[30]; } args;
+void mccwrite(FILE *fd, char *fmt, struct { unsigned v[30]; } args)
 {
   char linebuf[500];
   sprintf(linebuf,fmt,args);

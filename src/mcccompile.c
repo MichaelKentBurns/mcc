@@ -15,7 +15,6 @@
 /*                                                                   */
 /*  Internal functions in this module                                */
 /* INCLUDE .h                                                        */
-#include "mcc.h"
 /* GLOBAL DECLARATIONS:                                              */
 /* EXTERNAL INTERFACES:                                              */
 /* HISTORY:                                                          */
@@ -25,6 +24,7 @@
 /* END                                                               */
 /*-------------------------------------------------------------------*/
 
+#include "mcc.h"
 
 static int tolist;
 static void mytolist()
@@ -60,8 +60,7 @@ static int myfputc(c,stream)
 /* BRIDGED:  none                                                    */
 /* PURPOSE: compile from stdin, listing to stdout                    */
 /* USAGE:                                                            */
- boolean mcccompile ()                 
-/* PARAMETERS:                                                       */
+ boolean mcccompile ()                                                
 {
 /* RETURNS:                                                          */
 /*   true if succeeded in compiling something (ie no errors)         */

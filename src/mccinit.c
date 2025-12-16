@@ -18,6 +18,7 @@
 #include "mcc.h"
 /* GLOBAL DECLARATIONS:                                              */
 /* EXTERNAL INTERFACES:                                              */
+#include <string.h>
 /* HISTORY:                                                          */
 /*                                                                   */
 /* NOTES:                                                            */

@@ -1,9 +1,7 @@
-Original Makefile from google search: create a Makefile for C program with src/ and /includes dirs
-
 # --- Project Variables ---
 
 # The name of the final executable
-TARGET := myprogram
+TARGET := mcc
 
 # Source directory, object directory, and includes directory
 SRC_DIR := src
@@ -11,8 +9,8 @@ OBJ_DIR := obj
 INC_DIR := includes
 
 # Compiler and flags
-CC := gcc
-CFLAGS := -Wall -Wextra -I$(INC_DIR) -v 
+CC := clang
+CFLAGS := -Wall -Wextra -I$(INC_DIR)
 # Linker flags (e.g., -lm for math library if needed)
 LDFLAGS :=
 

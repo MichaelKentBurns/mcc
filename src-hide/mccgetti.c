@@ -1,6 +1,6 @@
 
-#include "/sys/ins/base.ins.c";
-#include "/sys/ins/cal.ins.c";
+#include </sys/ins/base.ins.c>
+#include </sys/ins/cal.ins.c>
 unsigned long int mccgettick()
  {  
    time_$clock_t clock;

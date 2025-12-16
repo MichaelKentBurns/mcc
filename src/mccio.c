@@ -1,5 +1,7 @@
 #include "mcc.h"
 #include <ctype.h>
+#include <string.h>
+
 /*-------------------------------------------------------------------*/
 /* Copyright (c) 1986 by SAS Institute, Inc. Austin, Texas.          */
 /* NAME:     mcc i/o services                                        */

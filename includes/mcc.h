@@ -750,3 +750,15 @@ extern sourcep mccopensrc __ARGS((char *path; int bufsize));
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
 /* HISTORY:                                                          */
+
+/*-------------------------------------------------------------------*/
+/* MCC global functions:                                             */
+/*-------------------------------------------------------------------*/
+
+void mccinit(int argc, char **argv);
+void mccwrite(FILE *fd,char *fmt, ...); 
+void mccreadsrc(sourcep src, char *file, int line);
+ptr  mccmalloc(int size, char *file, int line);
+void mccfree(ptr p, char *file, int line);
+tokenp mcctokalloc(char *file, int line);
+void  mcctokfree(tokenp tok);
