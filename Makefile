@@ -10,7 +10,7 @@ INC_DIR := includes
 
 # Compiler and flags
 CC := clang
-CFLAGS := -Wall -Wextra -I$(INC_DIR)
+CFLAGS := -Wall -Wextra -I$(INC_DIR) -Dis_mcc_build
 # Linker flags (e.g., -lm for math library if needed)
 LDFLAGS :=
 

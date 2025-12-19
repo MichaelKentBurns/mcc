@@ -18,7 +18,10 @@
 #include "ustr.h"
 #include "ustrpriv.h"                    
 #include <stdio.h>
-extern char *malloc();
+#include <memory.h>
+#ifdef is_mcc_build
+#   include "mcc.h"
+#endif
 /* GLOBAL DECLARATIONS:                                              */
 /* EXTERNAL INTERFACES:                                              */
 /* HISTORY:                                                          */
@@ -28,6 +31,7 @@ extern char *malloc();
 /* END                                                               */
 /*-------------------------------------------------------------------*/
 
+int ustrAddNode (ustrPoolP pool, ustrNodeP node);                
 
 /******************************************************* ustrNewPool */
 /*-------------------------------------------------------------------*/
@@ -90,9 +94,7 @@ if ((pool = (ustrPoolP) malloc(sizeof(ustrPool))) != NULL)
 /* BRIDGED:  none                                                    */
 /* PURPOSE:  add a top level index to a pool                         */
 /* USAGE:                                                            */
-int ustrAddIndex (pool)                 
-/* PARAMETERS:                                                       */
-ustrPoolP  pool;
+int ustrAddIndex (ptr poolptr)                 
 {
 /* RETURNS:                                                          */
 /*  0 if ok, else error code: ???                                    */   
@@ -109,6 +111,7 @@ ustrPoolP  pool;
 /* END                                                               */
 /*-------------------------------------------------------------------*/       
 int i;
+ustrPoolP pool = (ustrPoolP) poolptr;
 ustrNodeP *pp;
 /****************************************************** ustrAddIndex **/
 if (pool != NULL)
@@ -278,10 +281,7 @@ return nnodes;
 /* BRIDGED:  none                                                    */
 /* PURPOSE: free a pool.                                             */
 /* USAGE:                                                            */
- void ustrPoolStats (pool, fd)
-/* PARAMETERS:                                                       */
- ptr pool;                      
- FILE *fd;
+ void ustrPoolStats (ptr pool, FILE* fd)
 {
 /* RETURNS:                                                          */
 /*   number of nodes                                                 */
@@ -415,11 +415,7 @@ return nnodes;
 /* BRIDGED:  none                                                    */
 /* PURPOSE: add a node to the pool using a pointer to constant text. */
 /* USAGE:                                                            */
- long ustrAddConst (poolp,text,id)                 
-/* PARAMETERS:                                                       */
- ptr poolp;
- ptr text;
- long id;
+ long ustrAddConst (ptr poolp, ptr text, long id) 
 {
 /* RETURNS:                                                          */
 /*   id of newly added member (same as input id) or 0 if errors      */
@@ -578,13 +574,13 @@ if (newnode)
 /* END                                                               */
 /*-------------------------------------------------------------------*/
 ustrPoolP pool;
-/********************************************************** ustrAddConst **/
+/********************************************************** ustrAddQuickConst **/
    pool = (ustrPoolP) poolp;
    *(pool->quicklist)[id] = text;
    return id;
 
 }
-/************************************************* end ustrAddConst **/
+/************************************************* end ustrAddQuickConst **/
 
 /***************************************************** ustrAddNode  */
 /*-------------------------------------------------------------------*/
@@ -598,7 +594,7 @@ ustrPoolP pool;
 /* BRIDGED:  none                                                    */
 /* PURPOSE: add a node to the pool using a pointer to node           */
 /* USAGE:                                                            */
-static int ustrAddNode (pool,node)                 
+int ustrAddNode (pool,node)                 
 /* PARAMETERS:                                                       */
  ustrPoolP pool;
  ustrNodeP node;
@@ -756,10 +752,7 @@ int        depth;
 /* BRIDGED:  none                                                    */
 /* PURPOSE: find an entry and return its text value                  */
 /* USAGE:                                                            */
-  ptr    ustrText(poolp, id) 
-/* PARAMETERS:                                                       */
- ptr    poolp;
- unsigned long id;
+  char*    ustrText(ptr poolp, unsigned long id) 
 {
 /* RETURNS:                                                          */
 /*   text of node, else NULL if not found                            */
@@ -840,7 +833,7 @@ int        i;
 /* BRIDGED:  none                                                    */
 /* PURPOSE: remove node from the pool using a pointer to name        */
 /* USAGE:                                                            */
-static ustrMoveTree (pool, node)                 
+static unsigned long ustrMoveTree (pool, node)                 
 /* PARAMETERS:                                                       */
  ustrPoolP pool;               
  ustrNodeP node;
@@ -884,10 +877,7 @@ static ustrMoveTree (pool, node)
 /* BRIDGED:  none                                                    */
 /* PURPOSE: remove node from the pool using a pointer to name        */
 /* USAGE:                                                            */
-unsigned long ustrRemText (pool, text)                 
-/* PARAMETERS:                                                       */
- ustrPoolP pool;
- char *text;
+unsigned long ustrRemText (ptr poolptr, char *text)                 
 {
 /* RETURNS:                                                          */
 /*   id of removed node if found, else NULL if not found             */
@@ -903,6 +893,7 @@ unsigned long ustrRemText (pool, text)
 /*                                                                   */
 /* END                                                               */
 /*-------------------------------------------------------------------*/
+ustrPoolP  pool = (ustrPoolP) poolptr;
 ustrNodeP  node;
 ustrNodeP  testnode;               
 ustrNodeP  parent;

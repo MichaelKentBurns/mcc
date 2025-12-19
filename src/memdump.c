@@ -1,5 +1,6 @@
 #include <ctype.h>
-#include <stdio.h>          
+#include <stdio.h>         
+#include <memory.h> 
 
 #define GLOBAL    
 #define AUTO    
@@ -58,7 +59,7 @@ void memdump(fd,description,name,a,p,l)
       description = "";
             
   fprintf(fd,"DUMP of '%s'%s%s (pointer=%016lx length=%d) :\n",description,
-              (name != NULL) ? " NAMED ": "", (name != NULL) ? name : "",p,l);
+              (name != NULL) ? " NAMED ": "", (name != NULL) ? name : "",p,l,1,2);
   cur = (long) a;
   nsame = 0;
   last16[0] = *a + 1;  /* guarantee that last16 does not match beginning text */

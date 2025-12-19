@@ -1,3 +1,2 @@
-#include <memory.h>
-#define malloc(size) mccmalloc(size)  
-#define free(addr) mccfree(addr)
+#define malloc(size) mccmalloc(size,__FILE__,__LINE__)  
+#define free(addr) mccfree(addr,__FILE__,__LINE__)

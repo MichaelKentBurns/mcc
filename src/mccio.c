@@ -27,6 +27,8 @@
 /*                                                                   */
 /* END                                                               */
 /*-------------------------------------------------------------------*/
+ void mcclistline(char *p);
+ void mccnewline(char *p);
  void mccreadsrc __ARGS((sourcep src, char* file, int line ));                                     
  static char *makepath __ARGS((char *dir, char *file, char *buf));
  static char *makepath(dir,file,buf)
@@ -110,14 +112,14 @@
             if (src->pathname && strcmp(pathname,src->inpath) == 0)
               { 
                 if (mccoption[MCCOPTLISTING])
-                   MCCWRITE(MCCLISTF,mccerrmsg[MCCSRCREPEAT],pathname);
+                   MCCWRITE(MCCLISTF,mccerrmsg[MCCSRCREPEAT],1,pathname);
                 return NULL;
               }     
        for (src = mccsrc; src; src = src->right )
          if (src->pathname && strcmp(pathname,src->inpath) == 0)
            {
              if (mccoption[MCCOPTLISTING])
-                MCCWRITE(MCCLISTF,mccerrmsg[MCCSRCLOOP],
+                MCCWRITE(MCCLISTF,mccerrmsg[MCCSRCLOOP],3,
                    pathname,mccsrc->pathname,mccsrc->lineno); 
              return NULL;
            }                    
@@ -127,7 +129,7 @@
           path = pathname;
 #ifdef DEBUG
            if (dotrace)
-              MCCWRITE(MCCLISTF,"attempt to open pathname '%s'\n",path);
+              MCCWRITE(MCCLISTF,"attempt to open pathname '%s'\n",1,path);
 #endif
           if (strcmp(path,"-") == 0)
              fd = stdin;
@@ -142,7 +144,7 @@
                                  pathname,pathtemp);
 #ifdef DEBUG
            if (dotrace)
-              MCCWRITE(MCCLISTF,"attempt to open pathname '%s'\n",path);
+              MCCWRITE(MCCLISTF,"attempt to open pathname '%s'\n",1,path);
 #endif
            fd = fopen(path,mode);
            if (!fd)
@@ -154,7 +156,7 @@
                   path = makepath(mccidirs[search],pathname,pathtemp);
 #ifdef DEBUG
            if (dotrace)
-              MCCWRITE(MCCLISTF,"attempt to open pathname '%s'\n",path);
+              MCCWRITE(MCCLISTF,"attempt to open pathname '%s'\n",1,path);
 #endif
                   if ((fd = fopen(path,mode)) != NULL)
                      break;
@@ -168,7 +170,7 @@
                  path = makepath(mccsysidir,pathname,pathtemp);
 #ifdef DEBUG
            if (dotrace)
-              MCCWRITE(MCCLISTF,"attempt to open pathname '%s'\n",path);
+              MCCWRITE(MCCLISTF,"attempt to open pathname '%s'\n",1,path);
 #endif
                fd = fopen(path,mode);
              }
@@ -177,12 +179,12 @@
       {
        if (searchtype != MCCNOSEARCH)
         {
-         MCCWRITE(MCCERRF,mccerrmsg[MCCOINCF],pathname); 
+         MCCWRITE(MCCERRF,mccerrmsg[MCCOINCF],1,pathname); 
          mccerrcount++;
         }
 #if 0
        else
-         MCCWRITE(MCCERRF,mccerrmsg[MCCEOSRCF],pathname); 
+         MCCWRITE(MCCERRF,mccerrmsg[MCCEOSRCF],1,pathname); 
 #endif
        return(NULL);
       }
@@ -259,14 +261,14 @@
    {
      if (mccsrc->flags & MCCNOLIST)
        MCCWRITE(MCCLISTF,
-           "NOTE: listing of file '%s' suppressed by -l~%c option.\n",
+           "NOTE: listing of file '%s' suppressed by -l~%c option.\n",2,
                src->pathname,(mccsrc->flags & MCCUSERH) ? 'u' : 's');
       else
        {
    MCCWRITE(MCCLISTF,
 "           /---------------------- begin file: %s ---------------------\n",
-           src->pathname);
-   MCCWRITE(MCCLISTF,
+           1,src->pathname);
+   MCCWRITE(MCCLISTF,1,
 "          /\n");
        }
     }
@@ -332,9 +334,9 @@
      && !(src->flags & MCCNOLIST))
    {
    MCCWRITE(MCCLISTF,
-"          \\\n");
+"          \\\n",0);
    MCCWRITE(MCCLISTF,
-"           \\------------------- %s %s ----------------\n",
+"           \\------------------- %s %s ----------------\n",2,
               (src == mccdefsrc) ? "end command line switches"  
                                  : "end file:",
               (src == mccdefsrc) ? ""  
@@ -365,7 +367,7 @@
                 {
                  if (src->pathname)
                    {
-                     MCCWRITE(MCCLISTF,mccerrmsg[MCCFILELIST],
+                     MCCWRITE(MCCLISTF,mccerrmsg[MCCFILELIST],6,
                        src->id,
                        src->incdepth * 2,
 /*2345678901234567890123456789012345678901234567890123456789012345678901234567890*/
@@ -397,7 +399,7 @@
         if (mccsrc && mccsrc->pathname
               && !(src->flags & MCCNOLIST))
           MCCWRITE(MCCLISTF,
-"                                  resume file: '%s' \n",
+"                                  resume file: '%s' \n",1,
               mccsrc->pathname);
       }
 
@@ -455,18 +457,18 @@ if (src->lineno <= 1)
       {
         if (mccsrc->flags & MCCNOLIST)
           MCCWRITE(MCCLISTF,
-           "NOTE: listing of file '%s' suppressed by -l~%c option.\n",
+           "NOTE: listing of file '%s' suppressed by -l~%c option.\n",2,
                src->pathname,(mccsrc->flags & MCCUSERH) ? 'u' : 's');
          else
           {
       MCCWRITE(MCCLISTF,
-"           /----------------- %s %s ----------------\n",
+"           /----------------- %s %s ----------------\n",2,
               (src == mccdefsrc) ? "begin command line switches"  
                                  : "begin file:",
               (src == mccdefsrc) ? ""  
                                  :  src->pathname);
       MCCWRITE(MCCLISTF,
-"          /\n");
+"          /\n",0);
           }
       }
   }
@@ -482,7 +484,7 @@ if (!(src->eof || src->fd == NULL))
 #ifdef DEBUG
    newcurcolumn = src->curchar - src->linestart + 1;
    if (newcurcolumn != curcolumn)
-      MCCWRITE(MCCLISTF,"INTERNAL ERROR, linestart recalculation, %d %d \n",
+      MCCWRITE(MCCLISTF,"INTERNAL ERROR, linestart recalculation, %d %d \n",2,
         newcurcolumn,curcolumn);
 #endif
 
@@ -520,8 +522,8 @@ if (!(src->eof || src->fd == NULL))
 #     if DEBUG
          src->buffer[cursize+ntoread+1] = '@';
          memdump(MCCLISTF,"CURRENT SOURCE BUFFER for file ",src->pathname,
-              src->buffer,src->buffer,
-              (mcctrcoption['b']) ? src->end - src->buffer : 128);
+              src->buffer,
+              (mcctrcoption['b']) ? src->end - src->buffer : 128,1,2);
 #     endif               
      }
   }
@@ -531,7 +533,7 @@ if (firstread)
 }
 
 
-mccnewline(p)
+void mccnewline(p)
 char *p;
  {                        
   sourcep src;
@@ -552,7 +554,7 @@ char *p;
      mcclistline(p);
  }
 
-mcclistline(p)
+void mcclistline(p)
 char *p;
  {           
   sourcep src;

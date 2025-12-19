@@ -14,13 +14,16 @@
 /* PURPOSE: initialize the compiler                                  */
 /*                                                                   */
 /*  Internal functions in this module                                */
+#include <stdlib.h>                            
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
+#include <unistd.h>
 // #ifdef unix
 #include <sys/types.h>
 #include <sys/times.h>
 // #endif
+#include <time.h>
 #include <setjmp.h>
 #undef GREATER
 #undef EQUAL
@@ -149,10 +152,9 @@ if (mccoption[MCCOPTVERBOSE])
   char *secondary;
   int optset;
 
-  MCCWRITE(MCCERRF,"Options summary: \n");
+  MCCWRITE(MCCERRF,"Options summary: \n",0);
   MCCWRITE(MCCERRF,
-"  - indicates option on, ~ indicates option off, . indicates option ignored\n"
-     );
+"  - indicates option on, ~ indicates option off, . indicates option ignored\n",0);
   for (opt = 0; opt <= '~'; opt++)
     {
       optval = mccoption[opt];
@@ -163,17 +165,17 @@ if (mccoption[MCCOPTVERBOSE])
           switch(opt)
            {    
             case MCCOPTOUTPUT:   
-              MCCWRITE(MCCERRF," %s",mccoutpath);
+              MCCWRITE(MCCERRF," %s",1,mccoutpath);
               break;
             case MCCOPTPPOUTPUT:   
-              MCCWRITE(MCCERRF," %s",mccppopath);
+              MCCWRITE(MCCERRF," %s",1,mccppopath);
               break;
             case MCCOPTERRFILE:
-              MCCWRITE(MCCERRF," %s",mccerrpath);
+              MCCWRITE(MCCERRF," %s",1,mccerrpath);
               break;
 #if 0
             case MCCOPTZSYSIDIR:
-              MCCWRITE(MCCERRF," %s",mccsysidir);
+              MCCWRITE(MCCERRF," %s",1,mccsysidir);
               break;
 #endif
             case MCCOPTTRACE: secondary = mcctrcoption; break;
@@ -191,24 +193,24 @@ if (mccoption[MCCOPTVERBOSE])
                   {
                    if (suboptval && !*secondary)
                      {
-                      MCCWRITE(MCCERRF,"~");
+                      MCCWRITE(MCCERRF,"~",0);
                       suboptval = FALSE;
                      }
                     else if (!suboptval && *secondary) 
                      {
-                      MCCWRITE(MCCERRF,"-");
+                      MCCWRITE(MCCERRF,"-",0);
                       suboptval = TRUE;
                      }
-                   MCCWRITE(MCCERRF,"%c",subopt);
+                   MCCWRITE(MCCERRF,"%c",1,subopt);
                   }
                } 
         }
     }
-   MCCWRITE(MCCERRF," %s %s",MCCOPTSYSIDIR,mccsysidir);
+   MCCWRITE(MCCERRF," %s %s",2,MCCOPTSYSIDIR,mccsysidir);
    for (i = 0; i < mccnidirs; i++)
-     MCCWRITE(MCCERRF," -%c %s",MCCOPTIDIR,mccidirs[i]);
-   MCCWRITE(MCCERRF," %c%s",(mccoptansi) ? '-' : '~', MCCOPTANSI+1);
-  MCCWRITE(MCCERRF,"\n");
+     MCCWRITE(MCCERRF," -%c %s",2,MCCOPTIDIR,mccidirs[i]);
+   MCCWRITE(MCCERRF," %c%s",2,(mccoptansi) ? '-' : '~', MCCOPTANSI+1);
+  MCCWRITE(MCCERRF,"\n",0);
  }   
 
 for (argno = 1,nfiles = 0;
@@ -271,7 +273,7 @@ for (argno = 1,nfiles = 0;
                  if ((mcclistf = fopen(listpath,"w")) == NULL)
                     {           
                      mcclistf = savelist;
-                     MCCWRITE(MCCERRF,mccerrmsg[MCCEOLSTF],listpath);
+                     MCCWRITE(MCCERRF,mccerrmsg[MCCEOLSTF],1,listpath);
                      mccerrcount++;
                      docompile = FALSE;
                     }
@@ -301,7 +303,7 @@ for (argno = 1,nfiles = 0;
                   else
                     if ((mccppof = fopen(pppath,"w")) == NULL)
                        {
-                        MCCWRITE(MCCERRF,mccerrmsg[MCCEOPPF],pppath);
+                        MCCWRITE(MCCERRF,mccerrmsg[MCCEOPPF],1,pppath);
                         mccerrcount++;  
                         docompile = FALSE;
                        }
@@ -321,7 +323,7 @@ for (argno = 1,nfiles = 0;
                  strcat(errpath,MCCEXTERR);
                  if ((mccerrf = fopen(errpath,"w")) == NULL)
                     {
-                     MCCWRITE(MCCERRF,mccerrmsg[MCCEOERF],errpath);
+                     MCCWRITE(MCCERRF,mccerrmsg[MCCEOERF],1,errpath);
                      mccerrcount++;  
                      docompile = FALSE;
                      mccerrf = stderr;
@@ -332,7 +334,7 @@ for (argno = 1,nfiles = 0;
            starterrors = mccerrcount;
            startwarnings = mccwarningcount;
            if (origsrc == NULL)
-              MCCWRITE(MCCERRF,mccerrmsg[MCCEOSRCF],arg);
+              MCCWRITE(MCCERRF,mccerrmsg[MCCEOSRCF],1,arg);
             else
              {                         
               if (docompile)
@@ -343,7 +345,7 @@ for (argno = 1,nfiles = 0;
                     else
                      {
                        MCCWRITE(MCCERRF,
-                          "SEVERE INTERNAL ERROR DURING COMPILE.\n");
+                          "SEVERE INTERNAL ERROR DURING COMPILE.\n",0);
                        mccerrcount++;
                      }
                   crokbufSet = FALSE;
@@ -358,12 +360,12 @@ for (argno = 1,nfiles = 0;
              }
           if (mccoption[MCCOPTLISTING] && mcclistpath != NULL)
             {
-             MCCWRITE(MCCLISTF,mccerrmsg[MCCSUMMARY],mccerrcount-starterrors,
+             MCCWRITE(MCCLISTF,mccerrmsg[MCCSUMMARY],3,mccerrcount-starterrors,
                                                      mccwarningcount-startwarnings,
                           mccerrmsg[MCCVERSION]);
              if (fclose(MCCLISTF))
                {
-                MCCWRITE(MCCERRF,mccerrmsg[MCCECLSTF],listpath);
+                MCCWRITE(MCCERRF,mccerrmsg[MCCECLSTF],1,listpath);
                 mccerrcount++;
                }
              mcclistf = savelist;
@@ -372,7 +374,7 @@ for (argno = 1,nfiles = 0;
                 && !mccoption[MCCOPTPPSTDOUT])
              if (fclose(mccppof))
                {
-                MCCWRITE(MCCERRF,mccerrmsg[MCCECPPF],pppath);
+                MCCWRITE(MCCERRF,mccerrmsg[MCCECPPF],1,pppath);
                 mccerrcount++;
                }
           mccppof = NULL;
@@ -380,7 +382,7 @@ for (argno = 1,nfiles = 0;
            {
              if (fclose(mccerrf))
                {
-                MCCWRITE(stderr,mccerrmsg[MCCECERF],errpath);
+                MCCWRITE(stderr,mccerrmsg[MCCECERF],1,errpath);
                 mccerrcount++;
                }
              mccerrf = stderr;
@@ -388,7 +390,7 @@ for (argno = 1,nfiles = 0;
          }
         else
          {
-           MCCWRITE(MCCERRF,mccerrmsg[MCCBADFTYPE],arg);
+           MCCWRITE(MCCERRF,mccerrmsg[MCCBADFTYPE],1,arg);
          }
        nfiles++;
      }
@@ -420,11 +422,12 @@ if (cpuseconds > 0.0 && emitstats)
 "\
 %s %s %d files, %d lines, %d tokens, %d bytes \n\
      in %.3f cpu-seconds (%ld wallclock).\n",
+        8,
         argv[0],
         (mccoption[MCCOPTPPONLY]) ? "PREPROCESSED" : "COMPILED",
         mcctotfiles,mcctotlines,mccntokens,mcctotbytes,cpuseconds,wallseconds);
    MCCWRITE(fd,"\
-     %d lines/cpu-second, %d bytes/cpu-second\n",
+     %d lines/cpu-second, %d bytes/cpu-second\n",2,
         (int) (mcctotlines/cpuseconds),(int) (mcctotbytes/cpuseconds));
    if (mcctrcoption['a'])
      {
@@ -434,17 +437,17 @@ if (cpuseconds > 0.0 && emitstats)
       nfreesbefore = mccnfrees;
       mcctokfreelist(mccfreetoks);
       MCCWRITE(fd,
-         "%d tokens remain on free list.\n",mccnfrees-nfreesbefore);
+         "%d tokens remain on free list.\n",1,mccnfrees-nfreesbefore);
       MCCWRITE(fd,
-         "Memory usage: peak=%d bytes, final=%d bytes.\n",
+         "Memory usage: peak=%d bytes, final=%d bytes.\n",2,
            mccmempeak,mccmemtot);     
       MCCWRITE(fd,
-         "         %d bigchunk allocations.\n",mccbigchunks);
+         "         %d bigchunk allocations.\n",1,mccbigchunks);
       MCCWRITE(fd,
-         "         %d allocations, %d went to malloc (%%%d)\n",
+         "         %d allocations, %d went to malloc (%%%d)\n",3,
               mccnmallocs,mccnrealmallocs,(mccnrealmallocs*100)/mccnmallocs); 
       MCCWRITE(fd,
-         "         %d frees, %d went to free (%%%d)\n",
+         "         %d frees, %d went to free (%%%d)\n",3,
               mccnfrees,mccnrealfrees,(mccnrealfrees*100)/mccnfrees); 
       for (slotno = 0; slotno < NMEMSIZES; slotno++)
         if (mccfbusage[slotno])
@@ -472,10 +475,10 @@ exit( ret) ;
 void mcccroak(sig)
   int sig;
  {
-   MCCWRITE(MCCERRF,"\n Signal %d caught during compile.\n",sig);
+   MCCWRITE(MCCERRF,"\n Signal %d caught during compile.\n",1,sig);
    if (mccsrc)
       {
-       MCCWRITE(MCCERRF,"source file='%s', line=%d, column=%d.\n",
+       MCCWRITE(MCCERRF,"source file='%s', line=%d, column=%d.\n",3,
                (mccsrc->pathname) ? mccsrc->pathname : "NULL",
                 mccsrc->lineno,mccsrc->curchar - mccsrc->linestart + 1);
       }

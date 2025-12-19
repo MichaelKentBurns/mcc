@@ -2,6 +2,10 @@
 #include "mcc.h"
 #undef malloc
 #undef free
+#include <memory.h>
+#include <stdlib.h>
+
+#undef free
 #define BLOCKSIG 'BLCK'
 extern int mccmemtot;
 extern int mccmempeak;
@@ -14,8 +18,7 @@ static char *bigblock = NULL;
 static int bigblockleft = 0;
 
 
-char *mccmalloc(size)
- int size;
+void* mccmalloc(int size, char *file, int line )
 {
  int *iaddr;
  int slotno;
@@ -83,8 +86,7 @@ char *mccmalloc(size)
  return((char *) iaddr);
 }
 
-void mccfree(addr)
- char *addr;
+void mccfree(char *addr, char *file, int line )
 {
   int *iaddr;
   int size;

@@ -11,7 +11,7 @@
 /* TYPE:                                                             */
 /* PRODUCT:  mikes c compiler                                        */
 /* LANGUAGE: C                                                       */
-/* MACHINE: apollo, IBM PC/RT, RS6000, Mac 26, iOS 26, ubuntu        */
+/* MACHINE: apollo, IBM PC/RT, RS6000, Mac 26                        */
 /* BRIDGED:  none                                                    */
 /* SCRIPT:                                                           */
 /* PURPOSE: define data types for c compiler                         */
@@ -330,19 +330,19 @@ typedef struct LENT
 #define MCCLISTF  mcclistf 
 #define MCCSRCF   stdin
 #define MCCWRITE  mccwrite              
-#define MCCERR(code) { MCCWRITE(MCCERRF,mccerrfmt,mccerrmsg[code],"",""); mccerrcount++; }
-#define MCCERR1(code,one) { MCCWRITE(MCCERRF,mccerrfmt,mccerrmsg[code],one,""); mccerrcount++; }
-#define MCCERR2(code,one,two) { MCCWRITE(MCCERRF,mccerrfmt,mccerrmsg[code],one,two); mccerrcount++; }
-#define MCCWARN(code)  { MCCWRITE(MCCERRF,mccwarnfmt,mccerrmsg[code],"","");  mccwarningcount++; }
-#define MCCWARN1(code,one)  { MCCWRITE(MCCERRF,mccwarnfmt,mccerrmsg[code],one,"");  mccwarningcount++; }
-#define MCCWARN2(code,one,two)  { MCCWRITE(MCCERRF,mccwarnfmt,mccerrmsg[code],one,two);  mccwarningcount++; }
-#define MCCABORT(code) { MCCWRITE(MCCERRF,mccabortfmt,mccerrmsg[code],__LINE__,__FILE__); abort(code); }
+#define MCCERR(code) { MCCWRITE(MCCERRF,mccerrfmt,3,mccerrmsg[code],"",""); mccerrcount++; }
+#define MCCERR1(code,one) { MCCWRITE(MCCERRF,mccerrfmt,3,mccerrmsg[code],one,""); mccerrcount++; }
+#define MCCERR2(code,one,two) { MCCWRITE(MCCERRF,mccerrfmt,3,mccerrmsg[code],one,two); mccerrcount++; }
+#define MCCWARN(code)  { MCCWRITE(MCCERRF,mccwarnfmt,mccerrmsg[code],3,"","");  mccwarningcount++; }
+#define MCCWARN1(code,one)  { MCCWRITE(MCCERRF,mccwarnfmt,3,mccerrmsg[code],one,"");  mccwarningcount++; }
+#define MCCWARN2(code,one,two)  { MCCWRITE(MCCERRF,mccwarnfmt,3,mccerrmsg[code],one,two);  mccwarningcount++; }
+#define MCCABORT(code) { MCCWRITE(MCCERRF,mccabortfmt,3,mccerrmsg[code],__LINE__,__FILE__); abort(); }
 #define MCCRETURN(code,val) { MCCWRITE(MCCERRF,mccabortfmt,3,mccerrmsg[code],__LINE__,__FILE__); return(val); }
 #if DEBUG
-#   define MCCTRC(str)  { MCCWRITE(MCCLISTF,mcctrcfmt,str,__LINE__,__FILE__); }  
-#   define MCCTRCd(str,n)  { MCCWRITE(MCCLISTF,mcctrcdfmt,str,n,__LINE__,__FILE__); }  
-#   define MCCTRCx(str,n)  { MCCWRITE(MCCLISTF,mcctrcxfmt,str,n,__LINE__,__FILE__); }  
-#   define MCCTRCs(str,s)  { MCCWRITE(MCCLISTF,mcctrcsfmt,str,s,__LINE__,__FILE__); }  
+#   define MCCTRC(str)  { MCCWRITE(MCCLISTF,mcctrcfmt,3,str,__LINE__,__FILE__); }  
+#   define MCCTRCd(str,n)  { MCCWRITE(MCCLISTF,mcctrcdfmt,3,str,n,__LINE__,__FILE__); }  
+#   define MCCTRCx(str,n)  { MCCWRITE(MCCLISTF,mcctrcxfmt,3,str,n,__LINE__,__FILE__); }  
+#   define MCCTRCs(str,s)  { MCCWRITE(MCCLISTF,mcctrcsfmt,3,str,s,__LINE__,__FILE__); }  
 #else
 #   define MCCTRC(str)
 #   define MCCTRCd(str,n)
@@ -751,9 +751,42 @@ extern sourcep mccopensrc (char *path, int bufsize, int searchtype );
 /* MCC global functions:                                             */
 /*-------------------------------------------------------------------*/
 boolean mccinit(int argc, char **argv);
+void mcccompile();
+
+/*  from mccerror.c */
+void mccerr(int code, tokenp tok);
+void mccwarning(int code, tokenp tok);
 void mccwrite(FILE *fd,char *fmt, int n,...); 
-void mccreadsrc(sourcep src, char *file, int line);
-ptr  mccmalloc(int size, char *file, int line);
+void*  mccmalloc(int size, char *file, int line);
 void mccfree(ptr p, char *file, int line);
+
+/*  from mccpp.c */
+tokenp mccpptok( int recursive ); /* 0 except when mccpptok calls itself */
+tokenp mcctok();
+tokenp mccendline(int line);
+void mccppfree( long id );
+int mccppspecial( tokenp tok );
+tokenp mccppexp( tokenp exp );
+
+/* from mccio.c */
+void mccnewline(char *p);
+
+/*  from mcctok.c */
 tokenp mcctokalloc(char *file, int line);
 void  mcctokfree(tokenp tok);
+void mcctokfreelist( tokenp dispose );
+tokenp mcctoklist ( char *expression);
+int mccreduce( tokenp *listp );
+tokenp mcctok( int spanlines );
+void mcctoktrace( tokenp tok, char *who );
+tokenp mcctokcopy( tokenp orig );
+void mccpushtok( tokenp tok);
+sourcep mccopensrc(
+               char *pathname,
+              int  bufsize,  /* 0 for default bufsize, -1 for no buffer           */
+              int searchtype /* MCCNOSEARCH, MCCHOMESEARCH, MCCSYSSEARCH         */
+              );
+void mccclosesrc( sourcep src );  /* if NULL then close (and pop) the top file on stack */
+void mccreadsrc(sourcep src, char *file, int line);
+
+void memdump(FILE *fd, char *description, char *name, char *a, long p, int l, int huh );

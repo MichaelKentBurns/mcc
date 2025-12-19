@@ -199,7 +199,7 @@ ustrAddQuickConst(mccgsym,"...",ELIPSIS       );
 }
 
 if (mccppsym)
-   ustrFreePool(mccppsym,NULL,mccppfree);
+   ustrFreePool(mccppsym,NULL,mccfree);
 if ((mccppsym = ustrNewPool(0,0l,NULL)) == NULL)
    MCCRETURN(MCCENOMEM,FALSE);
 
@@ -286,7 +286,7 @@ if (mccoption[MCCOPTPPONLY])
                            fprintf(mccppof,"\n#line %d\n",newline);
                     }
                    else
-                     fprintf(mccppof,"\n",newline);
+                     fprintf(mccppof,"\n%d\n",newline);
                   curline = newline;
                   curcolumn = 1;
                  }
@@ -383,20 +383,20 @@ if (mccoption[MCCOPTPPONLY])
     if (mccppof)
        fputc('\n',mccppof);                   
 
-    if (mccoption[MCCOPTTRACE] && mcctrcoption['s'])
-       MCCTRCd("Number of tokens output to pp file =",numtoks);
+//    if (mccoption[MCCOPTTRACE] && mcctrcoption['s'])
+//     MCCTRCd("Number of tokens output to pp file =",numtoks);
   }
 else
   {
-   MCCTRC("dont know how to do anything but -p as of yet");
+ //  MCCTRC("dont know how to do anything but -p as of yet");
   }             
 
 #    if DEBUG && 1                                               
        if (mccoption[MCCOPTXREF])
          {
-          MCCWRITE(MCCLISTF,"\n\nGLOBAL SYMBOLS: \n");
+          MCCWRITE(MCCLISTF,"\n\nGLOBAL SYMBOLS: \n",0);
           ustrDumpPool((ptr) MCCLISTF,mccgsym,NULL,NULL);
-          MCCWRITE(MCCLISTF,"\n\nPREPROCESSOR SYMBOLS: \n");
+          MCCWRITE(MCCLISTF,"\n\nPREPROCESSOR SYMBOLS: \n",0);
           ustrTraversePool(mccppsym,NULL,mccppdump);
          }
 #endif
@@ -410,7 +410,7 @@ if (mcctrcoption['a'])
    ustrPoolStats(mccppsym,MCCLISTF);
 if (!mcctrcoption['k'] || mcctrcoption['a'])
   {
-   ustrFreePool(mccppsym,NULL,mccppfree);
+   ustrFreePool(mccppsym,NULL,mccfree);
    mccppsym = NULL;
   }
 

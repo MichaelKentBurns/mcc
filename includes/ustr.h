@@ -27,6 +27,7 @@
 #ifndef TRUE
 #include "types.h"
 #endif
+#include <stdio.h>
 
 /* create a new ustr pool, and update pointer to quick table */
 extern ptr     ustrNewPool  (int nquick, long baseid, ptr (*quicktab)[]);
@@ -35,7 +36,7 @@ extern ptr     ustrNewPool  (int nquick, long baseid, ptr (*quicktab)[]);
 extern int     ustrAddIndex (ptr pool);               
 
 /* print pool statistics to file */
-extern void    ustrPoolStats (ptr pool, ptr fd);               
+extern void    ustrPoolStats (ptr pool, FILE* fd);               
 
 /* free a ustr pool , calling user function elfree for each element */
 extern int   ustrFreePool (ptr pool, ptr node, void (*elfree)()); 
@@ -52,7 +53,7 @@ extern long    ustrAddQuickConst (ptr pool, ptr text, long id);
 extern long    ustrAdd      (ptr pool, ptr text, long id);
                            
 /* return a pointer to the text of a ustr given its unique id, or NULL if not found */
-extern ptr     ustrText     (ptr pool, int id );           
+extern char*     ustrText     (ptr pool, unsigned long id );           
 
 /* return the unique id given the text, or 0 if not found */
 extern long    ustrId       (ptr pool, ptr text );

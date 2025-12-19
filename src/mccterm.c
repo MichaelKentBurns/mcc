@@ -15,6 +15,7 @@
 /*                                                                   */
 /*  Internal functions in this module                                */
 /* INCLUDE .h                                                        */
+#include <stdlib.h>                                          
 #include "mcc.h"   
 /* GLOBAL DECLARATIONS:                                              */
 /* EXTERNAL INTERFACES:                                              */
@@ -60,7 +61,7 @@ long int endpos;
 /********************************************************** mccterm **/
 if (mccerrcount + mccwarningcount)
      MCCWRITE(MCCERRF,
-          mccerrmsg[MCCSUMMARY],
+          mccerrmsg[MCCSUMMARY],4,
           pgmname,mccerrcount,mccwarningcount,mccerrmsg[MCCVERSION]);
 
 if (mccerrpath != NULL)

@@ -18,7 +18,7 @@ extern char *malloc();
 /* PURPOSE: parse out and preprocess c language tokens               */
 /*                                                                   */
 /*  Internal functions in this module                                */
-        tokenp mccendline ( int, line ;
+        tokenp mccendline ( int line );
         tokenp mccppexp ( tokenp );
 /* INCLUDE .h                                                        */
 /* GLOBAL DECLARATIONS:                                              */
@@ -87,8 +87,8 @@ int    dolit;
 int    litmacnestlevel;
 int    errors;
 
-static mccpptok_spanlines = TRUE;
-static macnestlevel = 0;
+static boolean mccpptok_spanlines = TRUE;
+static int macnestlevel = 0;
 static struct {
                 tokenp  macname;
                 tokenp  currepl;           
@@ -243,19 +243,19 @@ if (!isinited)
     __stdc__.value.pval = (char *) &__stdc__repl;
     __date__.value.pval = (char *) &__date__repl;
     __time__.value.pval = (char *) &__time__repl;
-    if ((tokenp ) ustrAddConst(mccppsym,__file__.text,&__file__)
+    if ((tokenp ) ustrAddConst(mccppsym,__file__.text,(long)&__file__)
                != &__file__)
        errors++;
-    if ((tokenp ) ustrAddConst(mccppsym,__line__.text,&__line__)
+    if ((tokenp ) ustrAddConst(mccppsym,__line__.text,(long)&__line__)
                != &__line__)
        errors++;
-    if ((tokenp ) ustrAddConst(mccppsym,__stdc__.text,&__stdc__)
+    if ((tokenp ) ustrAddConst(mccppsym,__stdc__.text,(long)&__stdc__)
                != &__stdc__)
        errors++;
-    if ((tokenp ) ustrAddConst(mccppsym,__date__.text,&__date__)
+    if ((tokenp ) ustrAddConst(mccppsym,__date__.text,(long)&__date__)
                != &__date__)
        errors++;
-    if ((tokenp ) ustrAddConst(mccppsym,__time__.text,&__time__)
+    if ((tokenp ) ustrAddConst(mccppsym,__time__.text,(long)&__time__)
                != &__time__)
        errors++;
     if (errors)
@@ -285,14 +285,14 @@ do {
 #if DEBUG
        if (curif != IFTHEN && curif != IFELSE && curif != IFNEVER)
         {
-        MCCWRITE(MCCLISTF,"INTERNAL ERROR: mccppiflevel=%d, curif=%d, mccpp.c:%d\n",
+        MCCWRITE(MCCLISTF,"INTERNAL ERROR: mccppiflevel=%d, curif=%d, mccpp.c:%d\n",3,
              mccppiflevel,curif,__LINE__);
         }
 #endif
 #if DEBUG
        if (mccppiflevel < 0)
         {
-        MCCWRITE(MCCLISTF,"INTERNAL ERROR: mccppiflevel=%d, mccpp.c:%d\n",
+        MCCWRITE(MCCLISTF,"INTERNAL ERROR: mccppiflevel=%d, mccpp.c:%d\n",2,
              mccppiflevel,__LINE__);
         }
 #endif
@@ -311,14 +311,14 @@ do {
 #if DEBUG
        if (curif < IFNEVER || curif > IFTHEN)
         {
-        MCCWRITE(MCCLISTF,"INTERNAL ERROR: mccppiflevel=%d, curif=%d, mccpp.c:%d\n",
+        MCCWRITE(MCCLISTF,"INTERNAL ERROR: mccppiflevel=%d, curif=%d, mccpp.c:%d\n",3,
              mccppiflevel,curif,__LINE__);
         }
 #endif
 #if DEBUG
        if (macnestlevel < 0)
         {
-        MCCWRITE(MCCLISTF,"INTERNAL ERROR: macnestlevel=%d, mccpp.c:%d\n",
+        MCCWRITE(MCCLISTF,"INTERNAL ERROR: macnestlevel=%d, mccpp.c:%d\n",2,
              macnestlevel,__LINE__);
         }
 #endif
@@ -332,8 +332,8 @@ do {
 #       if DEBUG && 1                                               
            if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
              {
-              MCCWRITE(MCCLISTF,"got macro expansion level %d tok=%08x\n",curlevel,tok);
-               MCCWRITE(MCCLISTF,"macname=%s, macrepl=%08x, macargs=%08x\n",
+              MCCWRITE(MCCLISTF,"got macro expansion level %d tok=%08x\n",2,curlevel,tok);
+               MCCWRITE(MCCLISTF,"macname=%s, macrepl=%08x, macargs=%08x\n",3,
                macname->text,macrepl,macargs);       
              }
 #       endif
@@ -441,7 +441,7 @@ do {
                {
 #               if DEBUG && 1                                               
                   if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
-                      MCCWRITE(MCCLISTF,"finished expansion (last token) of macro '%s'!\n",
+                      MCCWRITE(MCCLISTF,"finished expansion (last token) of macro '%s'!\n",1,
                          macname->text);
 #               endif          
                 macnestlevel--;  /* finished with macro expansion, pop off */
@@ -473,10 +473,10 @@ WARNING: Encountered end of compilation unit with unterminated \n\
   mccppifnestSloc[mccppiflevel].file,
   mccppifnestSloc[mccppiflevel].line,
                       tok->sourceLoc.file,tok->sourceLoc.line);
-                 MCCWRITE(MCCERRF,line);
+                 MCCWRITE(MCCERRF,line,0);
                  if (mccoption[MCCOPTLISTING])
                    {
-                     MCCWRITE(MCCLISTF,line);
+                     MCCWRITE(MCCLISTF,line,0);
                    }
                 }
              }
@@ -560,7 +560,7 @@ WARNING: Encountered end of compilation unit with unterminated \n\
                             if (path && *path)
                                if (!mccopensrc(path,0,searchtype))
 #                                 if 0
-                                     MCCWRITE(MCCERRF,mccerrmsg[MCCOINCF],path);
+                                     MCCWRITE(MCCERRF,mccerrmsg[MCCOINCF],1,path);
 #                                 else 
                                      ;
 #                                 endif
@@ -607,7 +607,7 @@ WARNING: Encountered end of compilation unit with unterminated \n\
                              { /* function type macro */ 
 #                              if DEBUG && 1                                               
                                  if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
-                                    MCCWRITE(MCCLISTF,"funct type macro named '%s'\n",
+                                    MCCWRITE(MCCLISTF,"funct type macro named '%s'\n",1,
                                              macname->text);
 #                              endif
                                macargs = macargs->right; /* skip lparen */
@@ -643,7 +643,7 @@ WARNING: Encountered end of compilation unit with unterminated \n\
                                           scan->value.ival = argno++;
 #                                         if DEBUG && 1                                               
                                            if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
-                                              MCCWRITE(MCCLISTF,"macro arg %d is '%s'\n",
+                                              MCCWRITE(MCCLISTF,"macro arg %d is '%s'\n",2,
                                                  scan->value.ival,scan->text);
 #                                         endif
                                          }          
@@ -703,7 +703,7 @@ WARNING: Encountered end of compilation unit with unterminated \n\
                                                scan->sourceLoc.line = 0;
                                        if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
                                            MCCWRITE(MCCLISTF,
-                           "repl tok '%s' follows %d blanks, curcolumn=%d\n",
+                           "repl tok '%s' follows %d blanks, curcolumn=%d\n",3,
                                              scan->text,
                                              scan->sourceLoc.column,
                                              curcolumn);
@@ -719,7 +719,7 @@ WARNING: Encountered end of compilation unit with unterminated \n\
                                                 scan->value.ival = argno;
 #                                               if DEBUG && 1                                               
                                                  if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
-                                                   MCCWRITE(MCCLISTF,"macro repl token '%s' is arg %d\n",
+                                                   MCCWRITE(MCCLISTF,"macro repl token '%s' is arg %d\n",2,
                                                            scan->text,scan->value.ival);
 #                                               endif
                                                 break;
@@ -738,7 +738,7 @@ WARNING: Encountered end of compilation unit with unterminated \n\
                              { /* object type macro */
 #                              if DEBUG && 1                                               
                                  if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
-                                   MCCWRITE(MCCLISTF,"object type macro named '%s'\n",
+                                   MCCWRITE(MCCLISTF,"object type macro named '%s'\n",1,
                                              macname->text);
 #                              endif
                                macrepl = macargs;
@@ -748,7 +748,7 @@ WARNING: Encountered end of compilation unit with unterminated \n\
                              {     
                               macname->value.pval = (ptr) macrepl;
                               macname->right = macargs;
-                              if ((tokenp ) ustrAddConst(mccppsym,macname->text,macname)
+                              if ((tokenp ) ustrAddConst(mccppsym,macname->text,(long) macname)
                                    != macname)
                                 {
                                  tokenp cur,currepl,newrepl;
@@ -796,7 +796,7 @@ WARNING: Encountered end of compilation unit with unterminated \n\
                                 }
 #                             if DEBUG && 1                                               
                                 if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
-                                  MCCWRITE(MCCLISTF,"mccpp: added '%s' to macro pool\n",macname->text);
+                                  MCCWRITE(MCCLISTF,"mccpp: added '%s' to macro pool\n",1,macname->text);
 #                             endif        
                              }
                          }
@@ -836,7 +836,7 @@ WARNING: Encountered end of compilation unit with unterminated \n\
                             }
                           else if (strcmp(nexttok->text,"ppdump") == 0)
                             {
-                              MCCWRITE(MCCLISTF,"curif = %d, if level=%d\n",
+                              MCCWRITE(MCCLISTF,"curif = %d, if level=%d\n",2,
                                        curif,mccppiflevel);
                             }
                         }
@@ -1172,12 +1172,10 @@ macnestlevel--;
                            if (mccoption[MCCOPTLISTING] && mcclistoption['#']
                                 || forcenote)
                               {
-                               MCCWRITE(MCCLISTF,
-"\
-NOTE: End of #if/#ifdef/#ifndef ... #endif which began at %d:%d.\n",
-  mccppifnestSloc[mccppiflevel].file,
-  mccppifnestSloc[mccppiflevel].line);
-                               MCCWRITE(MCCLISTF,"note: nestlevel=%d\n",
+                               MCCWRITE(MCCLISTF,"NOTE: End of #if/#ifdef/#ifndef ... #endif which began at %d:%d.\n",2,
+                                    mccppifnestSloc[mccppiflevel].file,
+                                    mccppifnestSloc[mccppiflevel].line);
+                               MCCWRITE(MCCLISTF,"note: nestlevel=%d\n",1,
                                    mccppiflevel);
                               }
                          }
@@ -1227,7 +1225,7 @@ NOTE: End of #if/#ifdef/#ifndef ... #endif which began at %d:%d.\n",
 #         if DEBUG && 1                                               
             if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
               MCCWRITE(MCCLISTF,
-                   "got invocation of macro '%s' at column %d!\n",
+                   "got invocation of macro '%s' at column %d!\n",2,
                        tok->text,tok->sourceLoc.column);
 #         endif          
           if (macname == &__file__)
@@ -1286,14 +1284,13 @@ NOTE: End of #if/#ifdef/#ifndef ... #endif which began at %d:%d.\n",
                              if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
                                {
                                  MCCWRITE(MCCLISTF,
-                                  "finished argument %d: ",argno);
+                                  "finished argument %d: ",1,argno);
                                  for (nexttok = lastarg;
                                       nexttok;
                                       nexttok = nexttok->right)
-                                   MCCWRITE(MCCLISTF,
-                                    "%s ",(nexttok->text) ? 
+                                   MCCWRITE(MCCLISTF,"%s ",1,(nexttok->text) ? 
                                        nexttok->text : "***EMPTY***");
-                                 MCCWRITE(MCCLISTF,"\n");
+                                 MCCWRITE(MCCLISTF,"\n",0);
                                }
 #                         endif
                           lasttok = NULL; /* end of current argument */
@@ -1346,7 +1343,7 @@ NOTE: End of #if/#ifdef/#ifndef ... #endif which began at %d:%d.\n",
                     }
 #                 if DEBUG && 1                                               
                      if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
-                       MCCWRITE(MCCLISTF,"got %d actual args\n",argno);
+                       MCCWRITE(MCCLISTF,"got %d actual args\n",1,argno);
 #                 endif       
                   /* validate same number of args as formals */
                   for (lastarg = macname->right;
@@ -1374,7 +1371,7 @@ NOTE: End of #if/#ifdef/#ifndef ... #endif which began at %d:%d.\n",
 #                if DEBUG && 1                                               
                   if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
                     MCCWRITE(MCCLISTF,
-                      " mac with args not followed immediately by paren.\n");
+                      " mac with args not followed immediately by paren.\n",0);
 #                endif          
                  if (nexttok && !(nexttok->ttype == PUNCT 
                                   && nexttok->value.ival == LPAREN))
@@ -1473,7 +1470,7 @@ if (tok)
    column = tok->sourceLoc.column;
 #  if DEBUG && 1                                               
     if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
-       MCCWRITE(MCCLISTF,"returning token at %08x, text='%s' %d:%d:%d\n",tok,
+       MCCWRITE(MCCLISTF,"returning token at %08x, text='%s' %d:%d:%d\n",5,tok,
           (tok->text) ? tok->text : (tok->ttype == MARKER) ? "MARKER" : "NONE",
           tok->sourceLoc.file,tok->sourceLoc.line,tok->sourceLoc.column);
 #  endif
@@ -1482,7 +1479,7 @@ if (tok)
   {
 #  if DEBUG && 1                                               
     if (mccoption[MCCOPTTRACE] && mcctrcoption['p'])
-     MCCWRITE(MCCLISTF,"no tok to return, why are we here?\n");
+     MCCWRITE(MCCLISTF,"no tok to return, why are we here?\n",0);
 #  endif
     file = -1;
     line = -1;
@@ -1492,8 +1489,7 @@ if (tok)
 return tok;
 }                           
 
-tokenp mccendline(line)
- int line;
+tokenp mccendline(int line)
 {
  tokenp firsttok,prevtok,newtok;
             
@@ -1620,10 +1616,10 @@ tokenp mccppexp( exp )
 #ifdef DEBUG
   if (mccoption[MCCOPTTRACE] && mcctrcoption['e'])
     {
-      MCCWRITE(MCCLISTF,"mccppexp: ");      
+      MCCWRITE(MCCLISTF,"mccppexp: ",0);      
       for (cur = exp; cur ; cur = cur->right)
-MCCWRITE(MCCLISTF," %08x,%s,%d,%d ",cur,cur->text,cur->ttype,cur->value.ival);
-      MCCWRITE(MCCLISTF,"\n");
+MCCWRITE(MCCLISTF," %08x,%s,%d,%d ",4,cur,cur->text,cur->ttype,cur->value.ival);
+      MCCWRITE(MCCLISTF,"\n",0);
     }
 #endif
 
@@ -1635,7 +1631,7 @@ MCCWRITE(MCCLISTF," %08x,%s,%d,%d ",cur,cur->text,cur->ttype,cur->value.ival);
  cur->ttype = ILIT;
  cur->value.ival = 0;
  if (mccoption[MCCOPTLISTING])
-     MCCWRITE(MCCLISTF,"NOTE: treating undefined identifier '%s' as FALSE.\n",
+     MCCWRITE(MCCLISTF,"NOTE: treating undefined identifier '%s' as FALSE.\n",1,
                   (cur->text) ? cur->text : "**EMPTY**");
 } 
 
@@ -1644,7 +1640,7 @@ MCCWRITE(MCCLISTF," %08x,%s,%d,%d ",cur,cur->text,cur->ttype,cur->value.ival);
  int plevel = 1;
 #ifdef DEBUG
   if (mccoption[MCCOPTTRACE] && mcctrcoption['e'])
-    MCCWRITE(MCCLISTF,"found a lparen @ %08x, search for rparen\n",cur);      
+    MCCWRITE(MCCLISTF,"found a lparen @ %08x, search for rparen\n",1,cur);      
 #endif
  /* cur now points to a left paren */
  for (tail = cur->right; tail && plevel > 0 ; tail = tail->right)
@@ -1660,7 +1656,7 @@ MCCWRITE(MCCLISTF," %08x,%s,%d,%d ",cur,cur->text,cur->ttype,cur->value.ival);
  {
 #ifdef DEBUG
   if (mccoption[MCCOPTTRACE] && mcctrcoption['e'])
-       MCCWRITE(MCCLISTF,"found matching rparen @ %08x\n",tail);      
+       MCCWRITE(MCCLISTF,"found matching rparen @ %08x\n",1,tail);      
 #endif
    /* got a subexpression, cut out of exp and evaluate */
    /* tail points at the right paren */
@@ -1786,7 +1782,7 @@ MCCWRITE(MCCLISTF," %08x,%s,%d,%d ",cur,cur->text,cur->ttype,cur->value.ival);
 #if DEBUG
               if (mccoption[MCCOPTTRACE] && mcctrcoption['e'])
                {
-                  MCCWRITE(MCCLISTF,"binop %s,%d,%d  %s,%d,%d  %s,%d,%d = %d\n",
+                  MCCWRITE(MCCLISTF,"binop %s,%d,%d  %s,%d,%d  %s,%d,%d = %d\n",10,
                           (left->ttype == ILIT) ? "ILIT" : left->text,
                                   left->ttype,left->value.ival,
                           cur->text,cur->ttype,cur->value.ival,
@@ -1800,23 +1796,23 @@ MCCWRITE(MCCLISTF," %08x,%s,%d,%d ",cur,cur->text,cur->ttype,cur->value.ival);
         if (mccoption[MCCOPTTRACE] && mcctrcoption['e'])
           {
            if (binop)
-             MCCWRITE(MCCLISTF,"binop %s,%d,%d  %s,%d,%d  %s,%d,%d = %d\n",
+             MCCWRITE(MCCLISTF,"binop %s,%d,%d  %s,%d,%d  %s,%d,%d = %d\n",10,
                      (left->ttype == ILIT) ? "ILIT" : left->text,
                            left->ttype,left->value.ival,
                      cur->text,cur->ttype,cur->value.ival,
                      (right->ttype == ILIT) ? "ILIT" : right->text,
                          right->ttype,right->value.ival,val);
            else if (preop)
-             MCCWRITE(MCCLISTF,"preop %s,%d,%d  %s,%d,%d = %d\n",
+             MCCWRITE(MCCLISTF,"preop %s,%d,%d  %s,%d,%d = %d\n",7,
                      cur->text,cur->ttype,cur->value.ival,
                      (right->ttype == ILIT) ? "ILIT" : right->text,
                           right->ttype,right->value.ival,cur->value.ival);
            else if (postop)
-             MCCWRITE(MCCLISTF,"postop %s,%d,%d  %s,%d,%d = %d\n",
+             MCCWRITE(MCCLISTF,"postop %s,%d,%d  %s,%d,%d = %d\n",7,
                      (left->ttype == ILIT) ? "ILIT" : left->text,
                          left->ttype,left->value.ival,
                      cur->text,cur->ttype,cur->value.ival,cur->value.ival);
-           else MCCWRITE(MCCLISTF,"noop %s,%d,%d\n",
+           else MCCWRITE(MCCLISTF,"noop %s,%d,%d\n",3,
                      cur->text,cur->ttype,cur->value.ival);
           }
 #endif

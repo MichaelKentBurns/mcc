@@ -1,5 +1,5 @@
-make -k  >& make.lst  
-grep ' error: ' make.lst | wc -l 
-tail -3 make.lst 
+make -k  >& lst/make.lst  
+grep ' error: ' lst/make.lst | wc -l 
+tail -3 lst/make.lst 
 sleep 4
-vi make.lst   
+vi lst/make.lst   

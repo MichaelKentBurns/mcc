@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <memory.h>
+#include <math.h>
 /*-------------------------------------------------------------------*/
 /* Copyright (c) 1986 by SAS Institute, Inc. Austin, Texas.          */
 /* NAME:     mcc tokenization services                               */
@@ -19,7 +21,7 @@
 #include "ustr.h" 
 /*  Internal functions in this module                                */
     token *mcctoklist();     /* turn string into token list          */
-    token *mcctok();         /* parse token from string              */
+    token *mcctok(int spanlines);         /* parse token from string              */
     tokenp mcctokcopy();     /* copy or make a new token             */
     void   mcctoktrace();    /* trace a new token                    */
     int    mccreduce();      /* reduce a token list                  */
@@ -183,7 +185,7 @@ return;
      {
 #     if DEBUG               
       if (mccoption[MCCOPTTRACE] && mcctrcoption['f'])
-          MCCWRITE(MCCLISTF,"mcctokfree:  freeing token @%08x\n",dispose);
+          MCCWRITE(MCCLISTF,"mcctokfree:  freeing token @%08x\n",1,dispose);
 #     endif     
       if (dispose->flags & TFmalloced)
          {
@@ -239,7 +241,7 @@ tokenp temp;
       temp = dispose->right;
 #     if DEBUG               
       if (mccoption[MCCOPTTRACE] && mcctrcoption['f'])
-          MCCWRITE(MCCLISTF,"mcctokfreelist:  freeing token @%08x\n",dispose);
+          MCCWRITE(MCCLISTF,"mcctokfreelist:  freeing token @%08x\n",1,dispose);
 #     endif     
       if (dispose->flags & TFmalloced)
          {
@@ -750,7 +752,7 @@ char *p;
    errors = 0;
    for (p = expression; *p; )
      {
-       cur = mcctok(&p);
+       cur = mcctok(FALSE);
        if (cur == NULL)
          errors++;
         else
@@ -924,7 +926,7 @@ int    newcomment;
 int    escnewline;      
 int    cplpl;        /* allow c++ syntax */
 int    commentToEol;  /* current comment is c++ sytle // */
-static stillInComment = FALSE; /* finished last token in mid comment */
+static int stillInComment = FALSE; /* finished last token in mid comment */
 int    breakline;
 int strlenwarning = FALSE;
 int strlitNewline = FALSE;
@@ -1426,8 +1428,9 @@ if (start == NULL)
            tok->flags |= TFLong;
 
         tok->text = malloc(len+1);
-        if (tok->text == NULL) 
-           MCCABORT(MCCENOMEM)
+        if (tok->text == NULL) {
+           MCCABORT(MCCENOMEM);
+        }
         else
           {
            memcpy(tok->text,text,len);
@@ -1530,7 +1533,7 @@ if (start == NULL)
       }                                                                
   mccsrc->curchar = p;
   if (incomment && tok && tok->ttype == EOFILE)
-     mccerror(MCCEOFCOMMENT,tok);
+     MCCERR(MCCEOFCOMMENT);
   mccntokens++;
   return tok;
 
@@ -1575,7 +1578,7 @@ char  *who;
              if (mccoption[MCCOPTTRACE] && mcctrcoption['t'])
                 MCCWRITE(MCCLISTF,
 "%s: tok@%08x,id=%d, loc=%d/%d/%d, text='%s',\n\
-         ttype=%d=%s,flags=%08x %c%c%c%c%c value=0x%08lx=%luu=%ld\n",
+         ttype=%d=%s,flags=%08x %c%c%c%c%c value=0x%08lx=%luu=%ld\n",18,
                      who,
                      tok, tok->id,
                      tok->sourceLoc.file,tok->sourceLoc.line,
@@ -1668,7 +1671,7 @@ tokenp tok;           /* pointer to token structure being built */
             len = strlen(text);
             tok->text = malloc(len+1);
             if (tok->text == NULL)
-               MCCABORT(MCCENOMEM)
+               MCCABORT(MCCENOMEM);
             memcpy(tok->text,text,len);
             tok->text[len] = 0;
          }
