@@ -39,11 +39,8 @@
 /* BRIDGED:  none                                                    */
 /* PURPOSE:                                                          */
 /* USAGE:                                                            */
- boolean mccinit (argc,argv)                 
-/* PARAMETERS:                                                       */
-   int argc;
-   char *argv[];
-{
+ boolean mccinit (int argc, char **argv)                 
+  {
 /* RETURNS:                                                          */
 /*   true if succeeded in intializing ok                             */
 /* FATAL ERRORS:                                                     */
@@ -149,7 +146,7 @@ for (argno = 1; argno < argc; argno++)
                              mccdefsrc = mccopensrc(NULL,1000,0);
                              if (mccdefsrc == NULL)
                               {
-                                MCCWRITE(MCCERRF,mccerrmsg[MCCENOMEM]);
+                                MCCWRITE(MCCERRF,mccerrmsg[MCCENOMEM],0);
                                 fatal++;
                                 return(!fatal);
                               }
@@ -207,7 +204,7 @@ for (argno = 1; argno < argc; argno++)
                           }                              
                          else
                           {
-                           MCCWRITE(MCCERRF,mccerrmsg[MCCMANYIDIRS],temp);
+                           MCCWRITE(MCCERRF,mccerrmsg[MCCMANYIDIRS],1, temp);
                            fatal++;
                           }
                        }
@@ -237,16 +234,16 @@ for (argno = 1; argno < argc; argno++)
              {
                char *p;            
                char c;
-               for (p = arg+2; c = *p; p++)
+               for (p = arg+2; (c = *p); p++)
                  {
                   if (c == '-' || c == '~')
                      value = c;
                     else
-                     if (c < 128 && secondary[c] != ' ')
-                         secondary[c] = value;
+                     if (c < 128 && secondary[(int) c] != ' ')
+                         secondary[(int) c] = value;
                        else
                          {
-                          MCCWRITE(MCCERRF,mccerrmsg[MCCBADSUBOPT],c,opt);
+                          MCCWRITE(MCCERRF,mccerrmsg[MCCBADSUBOPT],2,c,opt);
                           fatal++;
                          }
                  }
@@ -256,7 +253,7 @@ for (argno = 1; argno < argc; argno++)
           }
         if (badopt)                    
           {
-            MCCWRITE(MCCERRF,mccerrmsg[MCCWBADOPTION],arg);
+            MCCWRITE(MCCERRF,mccerrmsg[MCCWBADOPTION],1, arg);
             fatal++;
           }
       }

@@ -41,11 +41,11 @@ extern char *malloc();
 /* BRIDGED:  none                                                    */
 /* PURPOSE:  create a new ustr pool                                  */
 /* USAGE:                                                            */
- ptr ustrNewPool (nquick,baseid,quicktab)                 
-/* PARAMETERS:                                                       */
-   int  nquick;         /* (I) number of entries in quick table      */
-   long baseid;         /* (I) lowest id to use for this pool        */
-   ptr  (*quicktab)[];  /* (I) address of quick table                */
+ ptr ustrNewPool (
+        int nquick,          /* (I) number of entries in quick table */ 
+        long baseid,         /* (I) lowest id to use for this pool   */
+        ptr (*quicktab)[]    /* (I) address of quick table           */    
+ )
 {
 /* RETURNS:                                                          */
 /*   pointer to new pool or NULL if problems                         */

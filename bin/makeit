@@ -1,0 +1,5 @@
+make -k  >& make.lst  
+grep ' error: ' make.lst | wc -l 
+tail -3 make.lst 
+sleep 4
+vi make.lst   
