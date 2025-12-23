@@ -8,7 +8,7 @@
 /* TYPE:                                                             */
 /* PRODUCT: mikes C compiler                                         */
 /* LANGUAGE: C                                                       */
-/* MACHINE: apollo                                                   */
+/* MACHINE: apollo, IBM PC/RT, RS6000, Mac 26                        */
 /* BRIDGED:  none                                                    */
 /* SCRIPT:                                                           */
 /* PURPOSE: initialize the compiler                                  */
@@ -54,7 +54,7 @@ int mccterm(char* pgmname);
 /* BRIDGED:  none                                                    */
 /* PURPOSE:                                                          */
 /* USAGE:                                                            */
- int main (int argc, char** argv)                 
+ int main (int argc, char* argv[])
 {
 /* RETURNS:                                                          */
 /*   0 if all ran ok, else errors occured                            */
@@ -100,7 +100,19 @@ int starterrors;
 int emitstats = TRUE;
 int amcpp = FALSE;
 /********************************************************** mccmain **/
-start = times(NULL);
+     
+/* setup default file descriptors */
+     mccerrf = stderr;
+     mcclistf = stdout;
+     
+     
+     printf("You have entered %d arguments:\n", argc);
+
+        for (int i = 0; i < argc; i++) {
+            printf("%s\n", argv[i]);
+        }
+     
+start = times(&timesbuf);  // keeping time
 if (argc <= 1)
   {
    char **pp;

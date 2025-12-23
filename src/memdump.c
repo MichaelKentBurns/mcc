@@ -35,7 +35,7 @@ void memdump(fd,description,name,a,p,l)
  int  l;
 {
   struct { 
-           char address[16];
+           char address[20];
            char colon;
            char blank1;
            char hex[44];

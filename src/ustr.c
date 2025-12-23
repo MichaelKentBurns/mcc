@@ -21,6 +21,8 @@
 #include <memory.h>
 #ifdef is_mcc_build
 #   include "mcc.h"
+#else
+#   include "mcc.h"
 #endif
 /* GLOBAL DECLARATIONS:                                              */
 /* EXTERNAL INTERFACES:                                              */
@@ -453,7 +455,7 @@ if (newnode)
     else  /* must have been a duplicate */
       free(newnode);
   }          
- else
+ // else
   return 0;  /* abnormal completion */
 
 }
@@ -534,7 +536,7 @@ if (newnode)
         free(textp);
      }
   }          
- else
+ // else
   return 0;  /* abnormal completion */
 
 }
@@ -862,6 +864,7 @@ static unsigned long ustrMoveTree (pool, node)
      node->right = node->left = NULL;
      ustrAddNode(pool,node);
     }
+    return 0;
 }
 /****************************************************** end ustrMoveTree **/
 

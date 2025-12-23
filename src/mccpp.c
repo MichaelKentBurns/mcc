@@ -2,6 +2,7 @@ extern char *malloc();
 #define mlbfix
 #include "mcc.h"
 #include <time.h>
+#include <string.h>
 /*-------------------------------------------------------------------*/
 /* Copyright (c) 1986 by SAS Institute, Inc. Austin, Texas.          */
 /* NAME:     mccpp                                                   */
@@ -154,7 +155,7 @@ static token __stdc__
 ;
 
 /* static macro definition for __DATE__ */
-static char  __date__text[12];
+static char  __date__text[12+2];
 static token __date__repl 
 #if INITU
 = { SIGTOK, NULL, NULL, 0, 0, __date__text, 
@@ -169,7 +170,7 @@ static token __date__
 ;
 
 /* static macro definition for __TIME__ */
-static char  __time__text[10];
+static char  __time__text[10+2];
 static token __time__repl 
 #if INITU
 = { SIGTOK, NULL, NULL, 0, 0, __time__text, 
@@ -234,8 +235,8 @@ if (!isinited)
 #endif
     now = time(NULL);
     nowtm = localtime(&now);                         
-    sprintf(__date__text,"%.3s %.2d 19%.2d",mon_name[nowtm->tm_mon],
-                nowtm->tm_mday, nowtm->tm_year);
+    sprintf(__date__text,"%.3s %.2d %.4d",mon_name[nowtm->tm_mon],
+                nowtm->tm_mday, 1900 + nowtm->tm_year);
     sprintf(__time__text,"%.2d:%.2d:%.2d", nowtm->tm_hour,
                     nowtm->tm_min, nowtm->tm_sec);
     __file__.value.pval = (char *) &__file__repl;
@@ -1582,7 +1583,7 @@ int mccppspecial( tok )
    l->right = NULL;
  if (r)
    r->left = NULL;
-
+ return 0;
 }
 
 tokenp mccppexp( exp )
