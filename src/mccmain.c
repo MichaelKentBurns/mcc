@@ -39,7 +39,7 @@
 /*-------------------------------------------------------------------*/
 static jmp_buf crokbuf;
 static int crokbufSet = FALSE;
-void mcccroak();
+void mcccroak(int);
 void mccclosesrc(sourcep src);
 int mccterm(char* pgmname);
 /********************************************************** mccmain  */
@@ -221,7 +221,7 @@ if (mccoption[MCCOPTVERBOSE])
    MCCWRITE(MCCERRF," %s %s",2,MCCOPTSYSIDIR,mccsysidir);
    for (i = 0; i < mccnidirs; i++)
      MCCWRITE(MCCERRF," -%c %s",2,MCCOPTIDIR,mccidirs[i]);
-   MCCWRITE(MCCERRF," %c%s",2,(mccoptansi) ? '-' : '~', MCCOPTANSI+1);
+   MCCWRITE(MCCERRF," %c%s",2,(mccoptansi) ? '-' : '~', &MCCOPTANSI[1]);
   MCCWRITE(MCCERRF,"\n",0);
  }   
 
@@ -346,7 +346,7 @@ for (argno = 1,nfiles = 0;
            starterrors = mccerrcount;
            startwarnings = mccwarningcount;
            if (origsrc == NULL)
-              MCCWRITE(MCCERRF,mccerrmsg[MCCEOSRCF],1,arg);
+              MCCWRITETYPES(MCCERRF,mccerrmsg[MCCEOSRCF],mccwriteTypesS,1,arg);
             else
              {                         
               if (docompile)

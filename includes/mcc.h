@@ -1,5 +1,5 @@
-#define MCCVERSIONSTRING  "0.91"
-#define MCCVERSIONLONG  " version 0.91"
+#define MCCVERSIONSTRING  "0.92"
+#define MCCVERSIONLONG  " version 0.92"
 #define DEBUG 1
 /*-------------------------------------------------------------------*/
 /* Copyright (c) 1986 by SAS Institute, Inc. Austin, Texas.          */
@@ -330,6 +330,7 @@ typedef struct LENT
 #define MCCLISTF  mcclistf 
 #define MCCSRCF   stdin
 #define MCCWRITE  mccwrite              
+#define MCCWRITETYPES           mccwriteTypes
 #define MCCERR(code) { MCCWRITE(MCCERRF,mccerrfmt,3,mccerrmsg[code],"",""); mccerrcount++; }
 #define MCCERR1(code,one) { MCCWRITE(MCCERRF,mccerrfmt,3,mccerrmsg[code],one,""); mccerrcount++; }
 #define MCCERR2(code,one,two) { MCCWRITE(MCCERRF,mccerrfmt,3,mccerrmsg[code],one,two); mccerrcount++; }
@@ -340,15 +341,20 @@ typedef struct LENT
 #define MCCRETURN(code,val) { MCCWRITE(MCCERRF,mccabortfmt,3,mccerrmsg[code],__LINE__,__FILE__); return(val); }
 #if DEBUG
 #   define MCCTRC(str)  { MCCWRITE(MCCLISTF,mcctrcfmt,3,str,__LINE__,__FILE__); }  
-#   define MCCTRCd(str,n)  { MCCWRITE(MCCLISTF,mcctrcdfmt,3,str,n,__LINE__,__FILE__); }  
-#   define MCCTRCx(str,n)  { MCCWRITE(MCCLISTF,mcctrcxfmt,3,str,n,__LINE__,__FILE__); }  
-#   define MCCTRCs(str,s)  { MCCWRITE(MCCLISTF,mcctrcsfmt,3,str,s,__LINE__,__FILE__); }  
+#   define MCCTRCd(str,n)       { MCCWRITE(MCCLISTF,mcctrcdfmt,4,str,n,__LINE__,__FILE__); }
+#   define MCCTRCx(str,n)       { MCCWRITE(MCCLISTF,mcctrcxfmt,4,str,n,__LINE__,__FILE__); }
+#   define MCCTRCs(str,s)       { MCCWRITE(MCCLISTF,mcctrcsfmt,4,str,s,__LINE__,__FILE__); }  
 #else
 #   define MCCTRC(str)
 #   define MCCTRCd(str,n)
 #   define MCCTRCx(str,n)
 #   define MCCTRCs(str,s)
 #endif                                                                 
+#define mccwriteTypesS    1    // 1 string
+#define mccwriteTypesSS   2    // 2 strings
+#define mccwriteTypesSSNS 3    // 2 strings, a number, and another string
+#define mccwriteTypesSSSS 4    // 4 args all strings
+
 #include "mcchost.h"
 
 /*-------------------------------------------------------------------*/
@@ -751,12 +757,13 @@ extern sourcep mccopensrc (char *path, int bufsize, int searchtype );
 /* MCC global functions:                                             */
 /*-------------------------------------------------------------------*/
 boolean mccinit(int argc, char **argv);
-void mcccompile();
+boolean mcccompile();
 
 /*  from mccerror.c */
 void mccerr(int code, tokenp tok);
 void mccwarning(int code, tokenp tok);
 void mccwrite(FILE *fd,char *fmt, int n,...); 
+void mccwriteTypes  (FILE *fd,char *fmt, int typePattern, int n,...);
 void*  mccmalloc(int size, char *file, int line);
 void mccfree(ptr p, char *file, int line);
 
