@@ -16,6 +16,9 @@
 *.gch
 *.pch
 
+# Precompiled C files
+*.i
+
 # Libraries
 *.lib
 *.a
