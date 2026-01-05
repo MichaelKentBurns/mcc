@@ -1,3 +1,11 @@
 {
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/workspaces/mcc",
+            "binaryPath": "/workspaces/mcc/mcc",
+            "binaryArgs": []
+        }
+    ],
+    "makefile.buildLog": "lst/make.lst"
 }
